@@ -6,7 +6,11 @@ Zab's Customizer is an FFXIV plugin that lets mod authors configure bespoke cust
 
 ## Installation
 
-TODO: Custom repo!
+1. Add the custom repo `https://github.com/universalconquistador/Stagehand/releases/latest/download/repo.json` in your Dalamud settings.
+
+   Remember to click the plus icon to actually add the repo after typing/pasting it in, and remember to click the save button as well.
+
+2. Search for Zab's Customizer and install it.
 
 ## Usage
 
