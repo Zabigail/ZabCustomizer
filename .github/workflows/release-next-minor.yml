@@ -1,0 +1,66 @@
+name: Release Minor Version
+
+on:
+  workflow_dispatch
+permissions:
+  contents: write # For committing the new version number back to the repo
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      Solution_Name: ZabCustomizer
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+
+    - name: Install .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: 10.0.x
+
+    - name: Install .NET Version CLI
+      run: dotnet tool install dotnet-version-cli
+
+    - name: Set Git commit author
+      run: git config user.name "UniversalConquistador (CI Job)" && git config user.email "universalconquistador@gmail.com"
+
+    - name: Bump minor version and commit
+      run: 'dotnet version -f ZabCustomizer/ZabCustomizer.csproj minor -m "CI: Bumps minor version for release $newVer."'
+
+    - name: Download Dalamud
+      run: curl --output latest.zip -L "https://goatcorp.github.io/dalamud-distrib/latest.zip"
+
+    - name: Extract Dalamud
+      run: unzip latest.zip -d /home/runner/dalamud-distrib
+
+    - name: Restore dependencies
+      run: dotnet restore ZabCustomizer
+
+    - name: Build with dotnet
+      run: dotnet build ZabCustomizer /p:Platform="x64" --no-restore --configuration Release
+      env:
+        DALAMUD_HOME: /home/runner/dalamud-distrib
+
+    - name: Push versioning commit
+      run: git push && git push --tags
+
+    - name: Prepare Dalamud repo JSON
+      run: dotnet run MakeDalamudRepoTool.cs -- ZabCustomizer/bin/x64/Release/ZabCustomizer/ZabCustomizer.json repo.json
+
+    - name: Retrieve version
+      run: |
+        echo "TAG_NAME=$(cat ZabCustomizer/ZabCustomizer.csproj | grep -Po '(?<=Version>).*(?=</Version>)')" >> $GITHUB_OUTPUT
+      id: version
+
+    - name: Make GitHub release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ steps.version.outputs.TAG_NAME }}
+        files: |
+          ZabCustomizer/bin/x64/Release/ZabCustomizer/latest.zip
+          icon.png
+          repo.json
