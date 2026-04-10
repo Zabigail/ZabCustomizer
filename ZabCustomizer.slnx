@@ -1,0 +1,12 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="ZabCompressionHelper/ZabCompressionHelper.vcxproj" Id="3927ce19-210d-4db5-a419-4b56c55d65c1" />
+  <Project Path="ZabCustomizer/ZabCustomizer.csproj">
+    <Platform Project="x64" />
+  </Project>
+</Solution>

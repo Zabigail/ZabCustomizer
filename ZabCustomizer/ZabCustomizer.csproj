@@ -1,0 +1,48 @@
+﻿<Project Sdk="Dalamud.NET.Sdk/14.0.1">
+  <PropertyGroup>
+    <Version>1.0.0</Version>
+    <FileVersion>$(Version)</FileVersion>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <Platforms>x64</Platforms>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+
+    <!-- Dalamud Packager properties for the plugin manifest -->
+    <Author>UniversalConquistador</Author>
+    <Name>Zab's Customizer</Name>
+    <MinimumDalamudVersion>14.0.0</MinimumDalamudVersion>
+    <Punchline>Zab's mods, just how you like them.</Punchline>
+    <Description>
+      Customize Zab's mods with this easy-to-use plugin!
+      Use the Customize button in Penumbra on Zab's supported mods to get started.
+    </Description>
+    <RepoUrl>https://github.com/universalconquistador/ZabCustomizer</RepoUrl>
+    <Tags>objects;models;gpose;vfx</Tags>
+    <CategoryTags></CategoryTags>
+    <DalamudApiLevel>14</DalamudApiLevel>
+    <LoadRequiredState>1</LoadRequiredState>
+    <LoadSync>false</LoadSync>
+    <CanUnloadAsync>true</CanUnloadAsync>
+    <LoadPriority>1</LoadPriority>
+    <ImageUrls></ImageUrls>
+    <IconUrl></IconUrl>
+    <Changelog></Changelog>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Penumbra.Api" Version="5.13.1" />
+    <PackageReference Include="TerraFX.Interop.Windows" Version="10.0.26100.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="CompressionHelper\$(Platform)_$(Configuration)\ZabCompressionHelper.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ZabCompressionHelper\ZabCompressionHelper.vcxproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net10.0-windows7.0": {
+      "DalamudPackager": {
+        "type": "Direct",
+        "requested": "[14.0.1, )",
+        "resolved": "14.0.1",
+        "contentHash": "y0WWyUE6dhpGdolK3iKgwys05/nZaVf4ZPtIjpLhJBZvHxkkiE23zYRo7K7uqAgoK/QvK5cqF6l3VG5AbgC6KA=="
+      },
+      "DotNet.ReproducibleBuilds": {
+        "type": "Direct",
+        "requested": "[1.2.39, )",
+        "resolved": "1.2.39",
+        "contentHash": "fcFN01tDTIQqDuTwr1jUQK/geofiwjG5DycJQOnC72i1SsLAk1ELe+apBOuZ11UMQG8YKFZG1FgvjZPbqHyatg=="
+      },
+      "Penumbra.Api": {
+        "type": "Direct",
+        "requested": "[5.13.1, )",
+        "resolved": "5.13.1",
+        "contentHash": "kmpqhcbnnF+Ib0F9g7+1W17IbZ8Q8G2zn3MJURd/rmQiB3D7cm8YS2JRmvhDzrN5w9OMlfq7MFxVtwG419YkIA=="
+      },
+      "TerraFX.Interop.Windows": {
+        "type": "Direct",
+        "requested": "[10.0.26100.6, )",
+        "resolved": "10.0.26100.6",
+        "contentHash": "QjL9vliSWmscUv6A7bjvsryHjYnY0norqvCNcLXSdEy1VIIzMF6FiS7BuvLTBuGUeN9FY4zJbU65OsHEv7jG9A=="
+      },
+      "zabcompressionhelper": {
+        "type": "Project"
+      }
+    }
+  }
+}
