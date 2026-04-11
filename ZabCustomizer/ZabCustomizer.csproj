@@ -1,4 +1,4 @@
-<Project Sdk="Dalamud.NET.Sdk/14.0.1">
+﻿<Project Sdk="Dalamud.NET.Sdk/14.0.1">
   <PropertyGroup>
     <Version>1.1.0</Version>
     <FileVersion>$(Version)</FileVersion>
@@ -18,7 +18,7 @@
       Customize Zab's mods with this easy-to-use plugin!
       Use the Customize button in Penumbra on Zab's supported mods to get started.
     </Description>
-    <RepoUrl>https://github.com/universalconquistador/ZabCustomizer</RepoUrl>
+    <RepoUrl>https://github.com/Zabigail/ZabCustomizer</RepoUrl>
     <Tags>objects;models;gpose;vfx</Tags>
     <CategoryTags></CategoryTags>
     <DalamudApiLevel>14</DalamudApiLevel>
