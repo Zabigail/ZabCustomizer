@@ -21,7 +21,7 @@ public record class CustomizeDestination(string GroupJsonFilename, string GamePa
 /// <param name="Destinations">The groups and game paths to add the new file to.</param>
 /// <param name="AspectRecommendationWidth">The numberator (width) of the recommended aspect ratio.</param>
 /// <param name="AspectRecommendationHeight">The denominator (height) of the recommended aspect ratio.</param>
-public record class CustomizeSlot(string DisplayName, string OutputDirectory, List<CustomizeDestination> Destinations, int AspectRecommendationWidth = 1, int AspectRecommendationHeight = 1, string Notes = "");
+public record class CustomizeSlot(string DisplayName, string OutputDirectory, List<CustomizeDestination> Destinations, int IdealWidth = 1, int IdealHeight = 1, bool AlwaysResize = false, string Notes = "");
 
 /// <summary>
 /// Specifies the customization options that are available for a Penumbra mod.

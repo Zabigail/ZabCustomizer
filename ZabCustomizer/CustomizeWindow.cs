@@ -225,6 +225,17 @@ public class CustomizeWindow : Window
                     var infoTextWidth = ImGui.CalcTextSize(infoText).X;
                     ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail().X / 2.0f - infoTextWidth / 2.0f);
                     ImGui.TextDisabled(infoText);
+
+                    if (_definition.Slots[_selectedSlotIndex].AlwaysResize && (_definition.Slots[_selectedSlotIndex].IdealWidth != wrap.Width || _definition.Slots[_selectedSlotIndex].IdealHeight != wrap.Height))
+                    {
+                        using (ImRaii.PushFont(UiBuilder.IconFont))
+                        using (ImRaii.PushColor(ImGuiCol.Text, ImGuiColors.DalamudYellow))
+                        {
+                            ImGui.Text(FontAwesomeIcon.ExclamationTriangle.ToIconString());
+                        }
+                        ImGui.SameLine();
+                        ImGui.TextUnformatted($"Will be scaled to {_definition.Slots[_selectedSlotIndex].IdealWidth} x {_definition.Slots[_selectedSlotIndex].IdealHeight}.");
+                    }
                 }
                 else
                 {
@@ -337,9 +348,9 @@ public class CustomizeWindow : Window
                                 _isReady = false;
                             }
 
-                            if (!MatchesAspectRatio(wrap.Width, wrap.Height, slot.AspectRecommendationWidth, slot.AspectRecommendationHeight))
+                            if (!MatchesAspectRatio(wrap.Width, wrap.Height, slot.IdealWidth, slot.IdealHeight))
                             {
-                                _validationErrors.Add($"The aspect ratio of the input image must be {slot.AspectRecommendationWidth}:{slot.AspectRecommendationHeight}. Current aspect ratio: {slot.AspectRecommendationWidth}:{(float)wrap.Height / wrap.Width * slot.AspectRecommendationWidth:F2}.");
+                                _validationErrors.Add($"The aspect ratio of the input image must match {slot.IdealWidth} x {slot.IdealHeight}. Current size: {wrap.Width} x {wrap.Height}.");
                                 _isReady = false;
                             }
                         }
@@ -391,7 +402,7 @@ public class CustomizeWindow : Window
                     var outputPath = Path.Combine(ModDirectory, slot.OutputDirectory, outputFilename);
 
                     Directory.CreateDirectory(Path.Combine(ModDirectory, slot.OutputDirectory));
-                    _textureCompressor.CompressToTexFile(inputImageFilename, outputPath);
+                    _textureCompressor.CompressToTexFile(inputImageFilename, outputPath, slot.AlwaysResize ? slot.IdealWidth : 0, slot.AlwaysResize ? slot.IdealHeight : 0);
 
                     // Add the options to the Penumbra mod group JSONs
                     foreach (var destination in slot.Destinations)

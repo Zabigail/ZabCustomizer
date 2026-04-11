@@ -49,8 +49,9 @@ Customization support is added to a Penumbra mod by authoring a `customizations.
 			"DisplayName": "Phone Screen",
 			"Notes": "This is the texture that appears on the screen of the phone. Make sure to use a 16:9 image.",
 			"OutputDirectory": "custom_screens\\",
-			"AspectRecommendationWidth": 16,
-			"AspectRecommendationHeight": 9,
+			"IdealWidth": 1024,
+			"IdealHeight": 1024,
+			"AlwaysResize": true,
 			"Destinations": [
 				{
 					"GroupJsonFilename": "group_001_phone screen.json",
@@ -81,10 +82,13 @@ A helpful bit of text to show users that describes the slot.
 The folder that the compressed `.tex` files from this slot should be stored in, relative to the mod's base directory.  
 Remember that in JSON files, backslashes must be escaped with another backslash.
 
-### `"AspectRecommendationWidth": 16, "AspectRecommendationHeight": 9` (`int`)
+### `"IdealWidth": 1024, "IdealHeight": 1024` (`int`)
 
-The aspect ratio that this slot expects. If players try to use an image that does not match this aspect ratio, they get an error message instructing them to select an image with the correct ratio.  
-This fraction doesn't have to be simplified--you could use a full resolution like 512 : 1024, although this makes the ratio a little less obvious than a simplified fraction would.
+The width and height that this slot expects. If players try to use an image that does not match this aspect ratio, they get an error message instructing them to select an image with the correct ratio.  
+
+### `"AlwaysResize": true` (`bool`, optional)
+
+True to resize the input image to the `IdealWidth` and `IdealHeight`, and false to leave the image at its input size. Default: `false`
 
 ### `"Destinations": [ ... ]` (`array`)
 

@@ -49,20 +49,33 @@ enum class CompressionResult
  * 
  * @return A result code indicating success or failure.
  */
-extern "C" __declspec(dllexport) CompressionResult CompressTexture(const wchar_t* sourceImageFilename, const wchar_t* destinationTexFilename, ID3D11Device* d3d11Device)
+extern "C" __declspec(dllexport) CompressionResult CompressTexture(const wchar_t* sourceImageFilename, const wchar_t* destinationTexFilename, ID3D11Device* d3d11Device, int resizeWidth, int resizeHeight)
 {
     // Load the source image
     DirectX::TexMetadata metadata = { };
     DirectX::ScratchImage inputImage = { };
+    DirectX::ScratchImage* finalInput = &inputImage;
     HRESULT hr = DirectX::LoadFromWICFile(sourceImageFilename, DirectX::WIC_FLAGS_NONE, &metadata, inputImage);
     if (FAILED(hr))
     {
         return CompressionResult::InputError;
     }
 
+    // Resize if requested
+    DirectX::ScratchImage resizedImage = { };
+    if (resizeWidth != 0 && resizeHeight != 0)
+    {
+        hr = DirectX::Resize(*inputImage.GetImage(0, 0, 0), resizeWidth, resizeHeight, DirectX::TEX_FILTER_FLAGS::TEX_FILTER_DEFAULT, resizedImage);
+        if (SUCCEEDED(hr))
+        {
+            finalInput = &resizedImage;
+            metadata = resizedImage.GetMetadata();
+        }
+    }
+
     // Generate a full mip chain
     DirectX::ScratchImage inputImageWithMips = { };
-    hr = DirectX::GenerateMipMaps(*inputImage.GetImage(0, 0, 0), DirectX::TEX_FILTER_FLAGS::TEX_FILTER_DEFAULT, 0, inputImageWithMips);
+    hr = DirectX::GenerateMipMaps(*finalInput->GetImage(0, 0, 0), DirectX::TEX_FILTER_FLAGS::TEX_FILTER_DEFAULT, 0, inputImageWithMips);
     if (FAILED(hr))
     {
         return CompressionResult::MipsError;

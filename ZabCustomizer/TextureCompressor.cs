@@ -27,7 +27,7 @@ public unsafe partial class TextureCompressor : IDisposable
 #else
     [LibraryImport("CompressionHelper\\x64_Release\\ZabCompressionHelper.dll")]
 #endif
-    private static partial CompressionResult CompressTexture(char* sourceImageFilename, char* destinationTexFilename, ID3D11Device* d3d11Device);
+    private static partial CompressionResult CompressTexture(char* sourceImageFilename, char* destinationTexFilename, ID3D11Device* d3d11Device, int resizeWidth, int resizeHeight);
 
     private readonly ID3D11Device* _device;
     private readonly SemaphoreSlim _gpuCompressionSemaphore = new(1);
@@ -37,7 +37,7 @@ public unsafe partial class TextureCompressor : IDisposable
         _device = device;
     }
 
-    public void CompressToTexFile(string inputFilename, string outputFilename)
+    public void CompressToTexFile(string inputFilename, string outputFilename, int resizeWidth, int resizeHeight)
     {
         _gpuCompressionSemaphore.Wait();
         try
@@ -45,7 +45,7 @@ public unsafe partial class TextureCompressor : IDisposable
             fixed (char* inputFilenamePointer = inputFilename)
             fixed (char* outputFilenamePointer = outputFilename)
             {
-                var result = CompressTexture(inputFilenamePointer, outputFilenamePointer, _device);
+                var result = CompressTexture(inputFilenamePointer, outputFilenamePointer, _device, resizeWidth, resizeHeight);
                 if (result != CompressionResult.Success)
                 {
                     throw new Exception("Failed to compress! Result: " + result.ToString());
