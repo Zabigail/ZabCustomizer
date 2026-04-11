@@ -43,6 +43,7 @@ Customization support is added to a Penumbra mod by authoring a `customizations.
 ```json
 {
 	"Notes": "Text to show above the slot selection. Leave blank to show no notes.",
+	"Preview": "modpreview.png",
 	"Slots": [
 		{
 			"DisplayName": "Phone Screen",
@@ -61,13 +62,17 @@ Customization support is added to a Penumbra mod by authoring a `customizations.
 }
 ```
 
-Each customization file has some notes and defines a list of slots, which are the various customizations that a user can use. Each slot defines how an input image file from the user is to be converted into a .tex file and added as new choices to some of the Penumbra option groups in the mod.
+Each customization file has some notes, a preview image for the mod, and defines a list of slots, which are the various customizations that a user can use. Each slot defines how an input image file from the user is to be converted into a .tex file and added as new choices to some of the Penumbra option groups in the mod.
+
+### `"Preview": "modpreview.png"` (`string`, optional)
+
+A path to an image to show in the header of of the Penumbra mod, relative to the mod's base directory.
 
 ### `"DisplayName": "Phone Screen"` (`string`)
 
 What this slot should be called in the customize window.
 
-### `"Notes": "..."` (`string`)
+### `"Notes": "..."` (`string`, optional)
 
 A helpful bit of text to show users that describes the slot.
 

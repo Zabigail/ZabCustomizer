@@ -27,7 +27,7 @@ public record class CustomizeSlot(string DisplayName, string OutputDirectory, Li
 /// Specifies the customization options that are available for a Penumbra mod.
 /// </summary>
 /// <param name="Slots">The various options that can be customized.</param>
-public record class CustomizeDefinition(List<CustomizeSlot> Slots, string Notes = "")
+public record class CustomizeDefinition(List<CustomizeSlot> Slots, string Notes = "", string Preview = "")
 {
     /// <summary>
     /// The expected filename of customize definitions within Penumbra mods.

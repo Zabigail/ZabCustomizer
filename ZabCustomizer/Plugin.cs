@@ -97,6 +97,7 @@ public sealed class Plugin : IDalamudPlugin
     private void AddPenumbraSubscribers()
     {
         _penumbraEventSubscribers.Add(PostEnabledDraw.Subscriber(PluginInterface, DrawPenumbraUI));
+        _penumbraEventSubscribers.Add(PreSettingsTabBarDraw.Subscriber(PluginInterface, DrawPenumbraPreview));
         _penumbraEventSubscribers.Add(ModDirectoryChanged.Subscriber(PluginInterface, PenumbraModDirectoryChanged));
     }
 
@@ -139,6 +140,32 @@ public sealed class Plugin : IDalamudPlugin
                 {
                     ImGui.Text("Open the customization window");
                 }
+            }
+        }
+    }
+
+    private void DrawPenumbraPreview(string modDirectory, float titleBarWidth, float titleBoxWidth)
+    {
+        if (_definitionManager.PenumbraModDirectory == null)
+        {
+            return;
+        }
+
+        var fullModDirectory = Path.Combine(_definitionManager.PenumbraModDirectory, modDirectory);
+        if (_definitionManager.TryGetModCustomizeDefinition(fullModDirectory, out var definition) && definition.Preview != "")
+        {
+            var previewTexture = TextureProvider.GetFromFile(Path.Combine(fullModDirectory, definition.Preview));
+            if (previewTexture.TryGetWrap(out var previewTextureWrap, out _))
+            {
+                const float maxHeight = 300.0f;
+
+                var verticalScale = (maxHeight * ImGuiHelpers.GlobalScale) / (previewTextureWrap.Height * ImGuiHelpers.GlobalScale);
+                var horizontalScale = ImGui.GetContentRegionAvail().X / (previewTextureWrap.Width * ImGuiHelpers.GlobalScale);
+
+                var scale = MathF.Min(verticalScale, horizontalScale);
+                var finalSize = new Vector2(previewTextureWrap.Width * ImGuiHelpers.GlobalScale * scale, previewTextureWrap.Height * ImGuiHelpers.GlobalScale * scale);
+                ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(ImGui.GetContentRegionAvail().X / 2.0f - finalSize.X / 2.0f, 0.0f));
+                ImGui.Image(previewTextureWrap.Handle, finalSize);
             }
         }
     }
