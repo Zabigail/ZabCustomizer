@@ -87,6 +87,13 @@ public class CustomizeWindow : Window
 
     public override void Draw()
     {
+        if (_definition.Notes.Length > 0)
+        {
+            ImGui.Spacing();
+            ImGui.TextWrapped(_definition.Notes);
+            ImGui.Spacing();
+        }
+
         ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
         if (ImGui.Combo("###SlotCombo", ref _selectedSlotIndex, _definition.Slots, slot => slot.DisplayName))
         {
@@ -96,6 +103,16 @@ public class CustomizeWindow : Window
 
         using (ImRaii.PushIndent())
         {
+            if (_selectedSlotIndex >= 0 && _selectedSlotIndex < _definition.Slots.Count)
+            {
+                if (_definition.Slots[_selectedSlotIndex].Notes.Length > 0)
+                {
+                    ImGui.Spacing();
+                    ImGui.TextWrapped(_definition.Slots[_selectedSlotIndex].Notes);
+                    ImGui.Spacing();
+                }
+            }
+
             using (var table = ImRaii.Table("###SlotTable", numColumns: 2))
             {
                 ImGui.TableSetupColumn("Properties", ImGuiTableColumnFlags.WidthStretch, 1.0f);

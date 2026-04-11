@@ -42,9 +42,11 @@ Customization support is added to a Penumbra mod by authoring a `customizations.
 
 ```json
 {
+	"Notes": "Text to show above the slot selection. Leave blank to show no notes.",
 	"Slots": [
 		{
 			"DisplayName": "Phone Screen",
+			"Notes": "This is the texture that appears on the screen of the phone. Make sure to use a 16:9 image.",
 			"OutputDirectory": "custom_screens\\",
 			"AspectRecommendationWidth": 16,
 			"AspectRecommendationHeight": 9,
@@ -59,11 +61,15 @@ Customization support is added to a Penumbra mod by authoring a `customizations.
 }
 ```
 
-Each customization file defines a list of slots, which are the various customizations that a user can use. Each slot defines how an input image file from the user is to be converted into a .tex file and added as new choices to some of the Penumbra option groups in the mod.
+Each customization file has some notes and defines a list of slots, which are the various customizations that a user can use. Each slot defines how an input image file from the user is to be converted into a .tex file and added as new choices to some of the Penumbra option groups in the mod.
 
 ### `"DisplayName": "Phone Screen"` (`string`)
 
 What this slot should be called in the customize window.
+
+### `"Notes": "..."` (`string`)
+
+A helpful bit of text to show users that describes the slot.
 
 ### `"OutputDirectory": "custom_screens\\"` (`string`)
 
