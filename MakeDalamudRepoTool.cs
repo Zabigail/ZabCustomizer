@@ -9,8 +9,8 @@ using System.Text.Json.Nodes;
 // Takes a Dalamud plugin manifest JSON and adapts it into a single-plugin Dalamud repository JSON.
 //
 
-const string IconUrl = "https://github.com/universalconquistador/ZabCustomizer/releases/latest/download/icon.png";
-const string DownloadUrl = "https://github.com/universalconquistador/ZabCustomizer/releases/latest/download/latest.zip";
+const string IconUrl = "https://github.com/Zabigail/ZabCustomizer/releases/latest/download/icon.png";
+const string DownloadUrl = "https://github.com/Zabigail/ZabCustomizer/releases/latest/download/latest.zip";
 
 if (args.Length != 2)
 {
