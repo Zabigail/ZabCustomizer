@@ -38,7 +38,7 @@ Zab's Customizer is an FFXIV plugin that lets mod authors configure bespoke cust
 
 ## Creators
 
-Customization support is added to a Penumbra mod by authoring a `customizations.json` file in the mod's base directory. The contents of this JSON file is defined in [`CustomizeDefinition.cs`](ZabCustomizer/CustomizeDefinition.cs), and a basic one looks like this:
+Customization support is added to a Penumbra mod by authoring a `customize.json` file in the mod's base directory. The contents of this JSON file is defined in [`CustomizeDefinition.cs`](ZabCustomizer/CustomizeDefinition.cs), and a basic one looks like this:
 
 ```json
 {
