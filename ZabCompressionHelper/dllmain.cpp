@@ -65,7 +65,7 @@ extern "C" __declspec(dllexport) CompressionResult CompressTexture(const wchar_t
     DirectX::ScratchImage resizedImage = { };
     if (resizeWidth != 0 && resizeHeight != 0)
     {
-        hr = DirectX::Resize(*inputImage.GetImage(0, 0, 0), resizeWidth, resizeHeight, DirectX::TEX_FILTER_FLAGS::TEX_FILTER_DEFAULT, resizedImage);
+        hr = DirectX::Resize(*inputImage.GetImage(0, 0, 0), resizeWidth, resizeHeight, DirectX::TEX_FILTER_FLAGS::TEX_FILTER_DEFAULT | DirectX::TEX_FILTER_FLAGS::TEX_FILTER_SRGB, resizedImage);
         if (SUCCEEDED(hr))
         {
             finalInput = &resizedImage;
@@ -75,7 +75,7 @@ extern "C" __declspec(dllexport) CompressionResult CompressTexture(const wchar_t
 
     // Generate a full mip chain
     DirectX::ScratchImage inputImageWithMips = { };
-    hr = DirectX::GenerateMipMaps(*finalInput->GetImage(0, 0, 0), DirectX::TEX_FILTER_FLAGS::TEX_FILTER_DEFAULT, 0, inputImageWithMips);
+    hr = DirectX::GenerateMipMaps(*finalInput->GetImage(0, 0, 0), DirectX::TEX_FILTER_FLAGS::TEX_FILTER_DEFAULT | DirectX::TEX_FILTER_FLAGS::TEX_FILTER_SRGB, 0, inputImageWithMips);
     if (FAILED(hr))
     {
         return CompressionResult::MipsError;
@@ -83,7 +83,7 @@ extern "C" __declspec(dllexport) CompressionResult CompressTexture(const wchar_t
 
     // Compress to BC7
     DirectX::ScratchImage compressedImageWithMips = { };
-    hr = DirectX::Compress((ID3D11Device*)d3d11Device, inputImageWithMips.GetImages(), inputImageWithMips.GetImageCount(), inputImageWithMips.GetMetadata(), DXGI_FORMAT::DXGI_FORMAT_BC7_UNORM, DirectX::TEX_COMPRESS_FLAGS::TEX_COMPRESS_DEFAULT, 0.5f, compressedImageWithMips);
+    hr = DirectX::Compress((ID3D11Device*)d3d11Device, inputImageWithMips.GetImages(), inputImageWithMips.GetImageCount(), inputImageWithMips.GetMetadata(), DXGI_FORMAT::DXGI_FORMAT_BC7_UNORM, DirectX::TEX_COMPRESS_FLAGS::TEX_COMPRESS_DEFAULT | DirectX::TEX_COMPRESS_FLAGS::TEX_COMPRESS_SRGB, 0.5f, compressedImageWithMips);
     if (FAILED(hr))
     {
         return CompressionResult::CompressionError;
