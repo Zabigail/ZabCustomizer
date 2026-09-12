@@ -13,53 +13,118 @@ namespace ZabCustomizer;
 /// </summary>
 public static class PenumbraModUtils
 {
-    public static async Task AddGroupOptionAsync(string groupJsonPath, string optionDisplayName, Dictionary<string, string> fileReplacements)
+    public record class PenumbraModOptionGroup(string Id, string Name, string DisplayName)
     {
-        JsonNode? groupJson;
-        using (var stream = new FileStream(groupJsonPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+        public bool IsDestinationTarget(CustomizeDestination destination)
         {
-            groupJson = await JsonNode.ParseAsync(stream);
-        }
-
-        if (groupJson != null && groupJson["Options"] is JsonArray array)
-        {
-            array.Add(new
+            if (destination.GroupId != null)
             {
-                Name = optionDisplayName,
-                Description = $"Added with Zab's Customizer on {DateTime.Now.ToShortDateString()}",
-                Files = fileReplacements,
-            });
-
-            using (var stream = new FileStream(groupJsonPath, FileMode.Create, FileAccess.Write))
-            using (var writer = new Utf8JsonWriter(stream))
+                return destination.GroupId == Id;
+            }
+            else if (destination.GroupJsonFilename != null)
             {
-                groupJson.WriteTo(writer);
+                string groupName = Path.GetFileNameWithoutExtension(destination.GroupJsonFilename).Substring("group_000_".Length);
+                return groupName.Equals(Name, StringComparison.OrdinalIgnoreCase);
+            }
+            else
+            {
+                // destination has neither group ID nor group JSON filename, which is invalid
+                return false;
             }
         }
     }
 
-    public static IEnumerable<(string jsonName, string groupName)> GetGroups(string modDirectory)
+    public static async Task AddGroupOptionAsync(string modDirectory, PenumbraModOptionGroup group, string optionDisplayName, Dictionary<string, string> fileReplacements)
     {
-        foreach (var groupJson in Directory.GetFiles(modDirectory, "group_*_*.json"))
+        // Read meta json
+        var jsonPath = Path.Combine(modDirectory, "meta.json");
+        JsonNode? modJsonNode = null;
+        try
         {
-            string? name = null;
+            using (var stream = new FileStream(jsonPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                modJsonNode = await JsonNode.ParseAsync(stream).ConfigureAwait(false);
+            }
+        }
+        catch (Exception ex)
+        {
+            Plugin.Log.Error(ex, $"Exception reading mod '{modDirectory}'.");
+        }
+
+        if (modJsonNode != null && modJsonNode.GetValueKind() == JsonValueKind.Object && modJsonNode["Groups"] is JsonArray groupArray)
+        {
+            // Add to the correct group
+            foreach (var groupNode in groupArray)
+            {
+                if (groupNode != null && groupNode.GetValueKind() == JsonValueKind.Object
+                    && groupNode["Id"] is JsonValue idValue && idValue.GetValueKind() == JsonValueKind.String && idValue.GetValue<string>() == group.Id
+                    && groupNode["Options"] is JsonArray optionsArray)
+                {
+                    optionsArray.Add(new
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = optionDisplayName,
+                        Description = $"Added with Zab's Customizer on {DateTime.Now.ToShortDateString()}",
+                        Files = fileReplacements,
+                    });
+                    break;
+                }
+            }
+
+            // Write meta json
             try
             {
-                using (var stream = new FileStream(groupJson, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (var stream = new FileStream(jsonPath, FileMode.Create, FileAccess.Write))
+                using (var writer = new Utf8JsonWriter(stream))
                 {
-                    var groupJsonNode = JsonNode.Parse(stream);
-                    if (groupJsonNode != null && groupJsonNode.GetValueKind() == JsonValueKind.Object && groupJsonNode["Name"] is JsonValue nameValue && nameValue.GetValueKind() == JsonValueKind.String)
+                    modJsonNode.WriteTo(writer);
+                }
+            }
+            catch (Exception ex)
+            {
+                Plugin.Log.Error(ex, $"Exception writing mod '{modDirectory}'.");
+            }
+        }
+        else
+        {
+            Plugin.Log.Error("Could not read mod.");
+        }
+    }
+
+    public static async Task<IReadOnlyList<PenumbraModOptionGroup>> GetGroupsAsync(string modDirectory)
+    {
+        var jsonPath = Path.Combine(modDirectory, "meta.json");
+        List<PenumbraModOptionGroup> groups = new();
+        try
+        {
+            using (var stream = new FileStream(jsonPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                var modJsonNode = await JsonNode.ParseAsync(stream).ConfigureAwait(false);
+                if (modJsonNode != null && modJsonNode.GetValueKind() == JsonValueKind.Object && modJsonNode["Groups"] is JsonArray groupArray)
+                {
+                    foreach (var groupNode in groupArray)
                     {
-                        name = nameValue.GetValue<string>();
+                        if (groupNode != null && groupNode.GetValueKind() == JsonValueKind.Object && groupNode["Id"] is JsonValue idValue && idValue.GetValueKind() == JsonValueKind.String && groupNode["Name"] is JsonValue nameValue && nameValue.GetValueKind() == JsonValueKind.String)
+                        {
+                            string id = idValue.GetValue<string>();
+                            string name = nameValue.GetValue<string>();
+                            string displayName = name;
+
+                            if (groupNode["DisplayName"] is JsonValue displayNameValue && displayNameValue.GetValueKind() == JsonValueKind.String)
+                            {
+                                displayName = displayNameValue.GetValue<string>();
+                            }
+
+                            groups.Add(new(id, name, displayName));
+                        }
                     }
                 }
             }
-            catch (Exception)
-            { }
-            if (name != null)
-            {
-                yield return (Path.GetFileName(groupJson), name);
-            }
         }
+        catch (Exception ex)
+        {
+            Plugin.Log.Error(ex, "Exception getting groups of mod '" + modDirectory + "'.");
+        }
+        return groups;
     }
 }

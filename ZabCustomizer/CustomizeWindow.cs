@@ -27,7 +27,8 @@ public class CustomizeWindow : Window
     private readonly Config _config;
 
     private readonly FileDialogManager _fileDialogManager;
-    private readonly Dictionary<string, string> _groupNames = new();
+
+    private IReadOnlyList<PenumbraModUtils.PenumbraModOptionGroup> _groups = Array.Empty<PenumbraModUtils.PenumbraModOptionGroup>();
 
     private object _statusLock = new();
     private readonly List<string> _validationErrors = new();
@@ -44,7 +45,7 @@ public class CustomizeWindow : Window
     private int _selectedSlotIndex = 0;
     private string _inputTextureFilename = "";
     private string _inputOptionName = "New Option";
-    private readonly HashSet<string> _selectedOutputGroups = new();
+    private readonly HashSet<string> _selectedOutputGroupIds = new();
 
     public CustomizeWindow(string modDirectory, CustomizeDefinition definition, ITextureProvider textureProvider, DefinitionManager definitionManager, TextureCompressor textureCompressor, Config config)
         : base($"Customize {Path.GetFileName(modDirectory)}")
@@ -163,23 +164,25 @@ public class CustomizeWindow : Window
                 ImGui.Text("Add to Groups:");
                 foreach (var destination in _definition.Slots[_selectedSlotIndex].Destinations)
                 {
-                    bool isChecked = _selectedOutputGroups.Contains(destination.GroupJsonFilename);
-
-                    string groupLabel = destination.GroupJsonFilename;
-                    if (_groupNames.TryGetValue(destination.GroupJsonFilename, out var groupName))
+                    var group = _groups.FirstOrDefault(group => group.IsDestinationTarget(destination));
+                    if (group == null)
                     {
-                        groupLabel = groupName;
+                        // The destination group doesn't actually exist in the mod
+                        continue;
                     }
-                    if (ImGui.Checkbox(groupLabel, ref isChecked))
+
+                    bool isChecked = _selectedOutputGroupIds.Contains(group.Id);
+
+                    if (ImGui.Checkbox(group.DisplayName, ref isChecked))
                     {
                         if (isChecked)
                         {
-                            _selectedOutputGroups.Add(destination.GroupJsonFilename);
+                            _selectedOutputGroupIds.Add(group.Id);
                             _ = RefreshStatus(_inputTextureFilename, _inputOptionName);
                         }
                         else
                         {
-                            _selectedOutputGroups.Remove(destination.GroupJsonFilename);
+                            _selectedOutputGroupIds.Remove(group.Id);
                             _ = RefreshStatus(_inputTextureFilename, _inputOptionName);
                         }
                     }
@@ -262,13 +265,9 @@ public class CustomizeWindow : Window
         _fileDialogManager.Draw();
     }
 
-    private void RefreshGroupNames()
+    private async void RefreshGroupNames()
     {
-        _groupNames.Clear();
-        foreach (var groupName in PenumbraModUtils.GetGroups(ModDirectory))
-        {
-            _groupNames[groupName.jsonName] = groupName.groupName;
-        }
+         _groups = await PenumbraModUtils.GetGroupsAsync(ModDirectory).ConfigureAwait(false);
     }
 
     // sets _validationErrors and _isReady
@@ -287,7 +286,7 @@ public class CustomizeWindow : Window
             return Task.CompletedTask;
         }
 
-        if (!_definition.Slots[_selectedSlotIndex].Destinations.Any(destination => _selectedOutputGroups.Contains(destination.GroupJsonFilename)))
+        if (!_definition.Slots[_selectedSlotIndex].Destinations.Any(destination => _groups.FirstOrDefault(group => group.IsDestinationTarget(destination)) is var group && group != null && _selectedOutputGroupIds.Contains(group.Id)))
         {
             // None of the destinations are selected
             lock (_statusLock)
@@ -407,10 +406,11 @@ public class CustomizeWindow : Window
                     // Add the options to the Penumbra mod group JSONs
                     foreach (var destination in slot.Destinations)
                     {
-                        if (_selectedOutputGroups.Contains(destination.GroupJsonFilename))
+                        var group = _groups.FirstOrDefault(group => group.IsDestinationTarget(destination));
+                        if (group != null && _selectedOutputGroupIds.Contains(group.Id))
                         {
                             _addStatus = $"Adding option to ${Path.GetFileNameWithoutExtension(destination.GroupJsonFilename)}";
-                            await PenumbraModUtils.AddGroupOptionAsync(Path.Combine(ModDirectory, destination.GroupJsonFilename), inputOptionName, new()
+                            await PenumbraModUtils.AddGroupOptionAsync(ModDirectory, group, inputOptionName, new()
                             {
                                 { destination.GamePath, Path.Combine(slot.OutputDirectory, outputFilename) },
                             });

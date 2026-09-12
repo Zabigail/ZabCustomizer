@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using TerraFX.Interop.DirectX;
 using TerraFX.Interop.Windows;
-using static Lumina.Data.Files.TexFile;
 
 namespace ZabCustomizer;
 
@@ -62,11 +61,6 @@ public unsafe partial class TextureCompressor : IDisposable
     {
         _device->Release();
         _gpuCompressionSemaphore.Dispose();
-    }
-
-    private static int Align(int value, int alignment)
-    {
-        return ((value + alignment - 1) / alignment) * alignment;
     }
     
     public static TextureCompressor Create(string pluginDirectory)

@@ -9,9 +9,10 @@ namespace ZabCustomizer;
 /// <summary>
 /// Identifies a Penumbra modpack option group to add an entry to, and a game path the entry should map to.
 /// </summary>
-/// <param name="GroupJsonFilename">The filename of the .json file that defines the group to add to, relative to the mod directory.</param>
+/// <param name="GroupId">The GUID of the Penumbra modpack group to add to, or null to use <paramref name="GroupJsonFilename"/>.</param>
+/// <param name="GroupJsonFilename">The filename of the .json file that defines the group to add to, relative to the mod directory, or null to use <paramref name="GroupId"/>.</param>
 /// <param name="GamePath">The absolute game path to map the entry to.</param>
-public record class CustomizeDestination(string GroupJsonFilename, string GamePath);
+public record class CustomizeDestination(string? GroupId, string? GroupJsonFilename, string GamePath);
 
 /// <summary>
 /// One customizable slot the player can add a texture to.
